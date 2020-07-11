@@ -7,6 +7,8 @@ local concat = table.concat
 
 local M = {}
 
+local ns = api.nvim_create_namespace("typeracer")
+
 local function make_client(host, port, callback)
   assert(host and port)
   local current_lobby
@@ -70,12 +72,14 @@ local function make_client(host, port, callback)
         for i = player.word, #words do
           local word = words[i]
           if i == player.word then
-            word = "_"..word:sub(1, player.char).."_"..word:sub(player.char+1)
+            word = word:sub(1, player.char-1).."_"..word:sub(player.char)
           end
           insert(word_state, word)
         end
         word_state = concat(word_state, " ")
-        insert(player_lines, format("%sP%d [%d]: %s", is_me and "*" or " ", k, player.word, word_state))
+        local prefix = format("%sP%d [%d]: ", is_me and "*" or " ", k, player.word)
+        insert(player_lines, prefix..word_state)
+        player.prefix_len = #prefix
       end
       local state_line
       if finished then
@@ -85,14 +89,25 @@ local function make_client(host, port, callback)
       elseif is_counting_down then
         state_line = format("COUNTDOWN %d", is_counting_down)
       else
-        state_line = "WAITING"
+        if is_leader then
+          state_line = "WAITING ON YOU! require'typeracer'.start() to start."
+        else
+          state_line = "WAITING ON LEADER"
+        end
       end
       local lines = {
-        current_lobby,
+        "LOBBY CODE: "..tostring(current_lobby),
         state_line,
+        string.rep("-", 80),
         player_lines,
       }
       api.nvim_buf_set_lines(buffer, 0, -1, false, vim.tbl_flatten(lines))
+      api.nvim_buf_clear_namespace(buffer, ns, 0, -1)
+      for i, k in ipairs(player_ids) do
+        local player = players[k]
+        local col = player.prefix_len + player.char
+        api.nvim_buf_add_highlight(buffer, ns, player.err and "Error" or "Bold", 2+i, col, col+1)
+      end
     end
 
     function command_handler.WORDS(args)
@@ -152,9 +167,7 @@ local function make_client(host, port, callback)
       attach_keybindings(buffer)
       api.nvim_set_current_buf(buffer)
       api.nvim_win_set_option(0, "wrap", false)
-      R.start = function()
-        send "START"
-      end
+      R.start = function() send "START" end
       R.check_key = check_key
     end
 
@@ -166,6 +179,10 @@ local function make_client(host, port, callback)
       api.nvim_set_current_buf(buffer)
       api.nvim_win_set_option(0, "wrap", false)
       R.check_key = check_key
+    end
+
+    function command_handler.PLAYER_DISCONNECTED(args)
+      players[tonumber(args[1] or -1) or false] = nil
     end
 
     function command_handler.JOIN_FAILED(args)
@@ -189,6 +206,13 @@ local function make_client(host, port, callback)
 
     function command_handler.STARTING(args)
       started = true
+    end
+
+    function command_handler.NEW_LEADER(args)
+      if client_id == tonumber(args[1]) then
+        is_leader = true
+        R.start = function() send "START" end
+      end
     end
 
     function command_handler.FINISHED(args)
@@ -259,6 +283,10 @@ function M.join_random(host, port)
     M.client = client
     client.join_random()
   end)
+end
+
+function M.start()
+  assert(assert(M.client, "no session active").start, "you're not the leader. you can't start!")()
 end
 
 function M.check_key(key)

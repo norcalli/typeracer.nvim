@@ -451,6 +451,26 @@ fn main() -> Result<()> {
                 ParseAction::Disconnect { client_id } => {
                     if let Some(lobby) = lobby {
                         lobby.clients.remove(&client_id);
+                        if let Some(client) = clients.get_mut(&client_id) {
+                            // Promote a new leader.
+                            if !lobby.clients.is_empty() && client.id == lobby.leader_id {
+                                lobby.leader_id = *lobby.clients.iter().choose(&mut rng).unwrap();
+                                let buffer = format!("NEW_LEADER {}\n", lobby.leader_id);
+                                let message = buffer.as_bytes();
+                                for client_id in &lobby.clients {
+                                    if let Some(client) = clients.get_mut(&client_id) {
+                                        try_send(client, message, &mut command_buffer);
+                                    }
+                                }
+                            }
+                        }
+                        let buffer = format!("PLAYER_DISCONNECTED {}\n", client_id);
+                        let message = buffer.as_bytes();
+                        for client_id in &lobby.clients {
+                            if let Some(client) = clients.get_mut(&client_id) {
+                                try_send(client, message, &mut command_buffer);
+                            }
+                        }
                     }
                     clients.remove(&client_id);
                 }

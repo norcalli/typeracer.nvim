@@ -8,6 +8,12 @@ TyperacerJoin CODE: Join a typeracer game.
 TyperacerStart: Start the countdown.
 TyperacerRestart: Restart a new race.
 
+# todo
+
+- [ ] ready up state
+- [ ] wpm at the end/as you type.
+- [ ] Close the lobby if the leader leaves or promote someone else.
+
 # TyperacerNew
 
 ```
