@@ -65,9 +65,14 @@ local function make_client(host, port, callback)
       local player_ids = vim.tbl_keys(players)
       table.sort(player_ids)
       local player_lines = {}
+      local player_draw_data = {}
       for _, k in ipairs(player_ids) do
         local player = players[k]
         local is_me = k == client_id
+        -- For optimistically drawing characters, ignore the network.
+        if is_me then
+          player = state
+        end
         local word_state = {}
         for i = player.word, #words do
           local word = words[i]
@@ -79,7 +84,7 @@ local function make_client(host, port, callback)
         word_state = concat(word_state, " ")
         local prefix = format("%sP%d [%d]: ", is_me and "*" or " ", k, player.word)
         insert(player_lines, prefix..word_state)
-        player.prefix_len = #prefix
+        player_draw_data[k] = { prefix_len = #prefix }
       end
       local state_line
       if finished then
@@ -104,8 +109,14 @@ local function make_client(host, port, callback)
       api.nvim_buf_set_lines(buffer, 0, -1, false, vim.tbl_flatten(lines))
       api.nvim_buf_clear_namespace(buffer, ns, 0, -1)
       for i, k in ipairs(player_ids) do
+        local data = player_draw_data[k]
         local player = players[k]
-        local col = player.prefix_len + player.char
+        local is_me = k == client_id
+        -- For optimistically drawing characters, ignore the network.
+        if is_me then
+          player = state
+        end
+        local col = data.prefix_len + player.char
         api.nvim_buf_add_highlight(buffer, ns, player.err and "Error" or "Bold", 2+i, col, col+1)
       end
     end
@@ -144,6 +155,7 @@ local function make_client(host, port, callback)
     end
 
     local function check_key(key)
+      if not started then return end
       assert(words)
       -- TODO(ashkan): cleanup
       local target = assert(words[state.word]):sub(state.char,state.char)
@@ -158,6 +170,15 @@ local function make_client(host, port, callback)
         state.err = true
       end
       send_state()
+
+      -- Optimistically draw your characters.
+      do
+        local p = players[client_id]
+        p.word = state.word
+        p.char = state.char
+        p.err = state.err
+        redraw()
+      end
     end
 
     function command_handler.CREATED(args)
