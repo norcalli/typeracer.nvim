@@ -527,7 +527,12 @@ fn main() -> Result<()> {
                 } => {
                     // Join random
                     let lobby_code = if lobby_code == PLACEHOLDER_CODE {
-                        match lobbies.keys().choose(&mut rng) {
+                        let lobby_code = lobbies
+                            .iter()
+                            .filter(|(_, v)| matches!(v.state, LobbyState::WaitingForStart | LobbyState::Countdown(_)))
+                            .map(|(k, _)|k)
+                            .choose(&mut rng);
+                        match lobby_code {
                             Some(key) => *key,
                             None => {
                                 try_send(
@@ -635,7 +640,7 @@ fn main() -> Result<()> {
 
         lobbies.retain(|_code, lobby| lobby.clients.iter().any(|c| clients.contains_key(c)));
 
-        std::thread::sleep(Duration::from_millis(5));
+        std::thread::sleep(Duration::from_millis(1));
     }
 
     // Ok(())
