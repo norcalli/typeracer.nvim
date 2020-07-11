@@ -226,26 +226,30 @@ end
 
 M.client = nil
 
-function M.create()
+
+function M.create(host, port)
   assert(not M.client)
-  return make_client("127.0.0.1", 1234, function(client)
+  local kiani_io_addr = uv.getaddrinfo("kiani.io")[1].addr
+  return make_client(host or kiani_io_addr, port or 1234, function(client)
     M.client = client
     client.create()
   end)
 end
 
-function M.join(code)
+function M.join(code, host, port)
   assert(not M.client)
   assert(code)
-  return make_client("127.0.0.1", 1234, function(client)
+  local kiani_io_addr = uv.getaddrinfo("kiani.io")[1].addr
+  return make_client(host or kiani_io_addr, port or 1234, function(client)
     M.client = client
     client.join(code)
   end)
 end
 
-function M.join_random()
+function M.join_random(host, port)
   assert(not M.client)
-  return make_client("127.0.0.1", 1234, function(client)
+  local kiani_io_addr = uv.getaddrinfo("kiani.io")[1].addr
+  return make_client(host or kiani_io_addr, port or 1234, function(client)
     M.client = client
     client.join_random()
   end)
