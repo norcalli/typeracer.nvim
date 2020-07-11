@@ -77,7 +77,7 @@ local function make_client(host, port, callback)
         for i = player.word, #words do
           local word = words[i]
           if i == player.word then
-            word = word:sub(1, player.char-1).."_"..word:sub(player.char)
+            word = word:sub(1, player.char-1).."|"..word:sub(player.char)
           end
           insert(word_state, word)
         end
