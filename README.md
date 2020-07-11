@@ -1,3 +1,7 @@
+![demo](https://raw.githubusercontent.com/norcalli/github-assets/master/typeracer-demo.gif)
+
+![demo.webm](https://raw.githubusercontent.com/norcalli/github-assets/master/typeracer-demo.webm)
+
 # Installation
 
 `Plug norcalli/typeracer.nvim`
