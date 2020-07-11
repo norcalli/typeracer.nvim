@@ -34,7 +34,7 @@ type ClientId = u64;
 
 const COUNTDOWN_TIME: Duration = Duration::from_secs(5);
 
-const WORD_COUNT: usize = 100;
+const WORD_COUNT: usize = 20;
 
 struct Lobby {
     code: LobbyCode,

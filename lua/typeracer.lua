@@ -101,7 +101,7 @@ local function make_client(host, port, callback)
 
     function command_handler.STATE(args)
       local client_id, cword, cchar, has_err = unpack(args)
-      players[client_id] = {
+      players[tonumber(client_id)] = {
         word = tonumber(cword)+1;
         char = tonumber(cchar)+1;
         err = has_err == "1";
