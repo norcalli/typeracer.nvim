@@ -519,13 +519,16 @@ fn main() -> Result<()> {
                     };
                     match lobbies.get_mut(&lobby_code) {
                         Some(lobby) => {
+                            // For join random
+                            client.lobby = Some(lobby_code);
                             // TODO(ashkan): check client didn't get inserted twice.
                             lobby.clients.insert(client_id);
                             command_buffer.push_back((client_id, Command::Words));
                             for client_id in &lobby.clients {
-                                let client = clients.get(&client_id).unwrap();
-                                command_buffer
-                                    .push_back((*client_id, Command::State(client.state)));
+                                if let Some(client) = clients.get(&client_id) {
+                                    command_buffer
+                                        .push_back((*client_id, Command::State(client.state)));
+                                }
                             }
                             let buffer = format!("JOINED {}\n", std::str::from_utf8(&lobby_code)?);
                             try_send(
@@ -564,9 +567,10 @@ fn main() -> Result<()> {
                         let buffer = format!("FINISHED {}\n", client_id);
                         let message = buffer.as_bytes();
                         for client_id in &lobby.clients {
-                            let client = clients.get_mut(&client_id).unwrap();
-                            // TODO(ashkan): handle errors here.
-                            try_send(client, message, &mut command_buffer);
+                            if let Some(client) = clients.get_mut(&client_id) {
+                                // TODO(ashkan): handle errors here.
+                                try_send(client, message, &mut command_buffer);
+                            }
                         }
                     } else {
                         let buffer = format!(
@@ -578,9 +582,10 @@ fn main() -> Result<()> {
                         );
                         let message = buffer.as_bytes();
                         for client_id in &lobby.clients {
-                            let client = clients.get_mut(&client_id).unwrap();
-                            // TODO(ashkan): handle errors here.
-                            try_send(client, message, &mut command_buffer);
+                            if let Some(client) = clients.get_mut(&client_id) {
+                                // TODO(ashkan): handle errors here.
+                                try_send(client, message, &mut command_buffer);
+                            }
                         }
                     }
                 }
@@ -593,9 +598,10 @@ fn main() -> Result<()> {
                 LobbyState::Countdown(deadline) if deadline <= Instant::now() => {
                     let message = b"STARTING\n";
                     for client_id in &lobby.clients {
-                        let client = clients.get_mut(&client_id).unwrap();
-                        // TODO(ashkan): handle errors here.
-                        try_send(client, message, &mut command_buffer);
+                        if let Some(client) = clients.get_mut(&client_id) {
+                            // TODO(ashkan): handle errors here.
+                            try_send(client, message, &mut command_buffer);
+                        }
                     }
                     lobby.state = LobbyState::RaceRunning;
                 }
