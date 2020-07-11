@@ -349,6 +349,10 @@ fn main() -> Result<()> {
                         client.read_buffer.len()
                     );
                 }
+                Ok(0) => {
+                    error!("[client={}] client hung up :(", client.id);
+                    command_buffer.push_back((client.id, Command::Disconnect));
+                }
                 Ok(bytes_read) => {
                     debug!(
                         "[client={}] Received {} bytes. Buflen: {}",
