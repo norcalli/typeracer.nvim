@@ -1,0 +1,65 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/a3c87ab5/
+ClientId	src/main.rs	/^type ClientId = u64;$/;"	t
+ClientState	src/main.rs	/^struct ClientState {$/;"	s
+Command	src/main.rs	/^enum Command {$/;"	g
+Countdown	src/main.rs	/^    Countdown(Instant),$/;"	e	enum:LobbyState
+Create	src/main.rs	/^    Create,$/;"	e	enum:Command
+CreateLobby	src/main.rs	/^    CreateLobby {$/;"	e	enum:ParseAction
+Dead	src/main.rs	/^    Dead,$/;"	e	enum:LobbyState
+E	target/debug/build/anyhow-589145d4db7f6717/out/probe.rs	/^    impl Display for E {$/;"	c
+E	target/debug/build/anyhow-589145d4db7f6717/out/probe.rs	/^    impl Error for E {$/;"	c
+E	target/debug/build/anyhow-589145d4db7f6717/out/probe.rs	/^    struct E;$/;"	s
+E	target/rls/debug/build/anyhow-589145d4db7f6717/out/probe.rs	/^    impl Display for E {$/;"	c
+E	target/rls/debug/build/anyhow-589145d4db7f6717/out/probe.rs	/^    impl Error for E {$/;"	c
+E	target/rls/debug/build/anyhow-589145d4db7f6717/out/probe.rs	/^    struct E;$/;"	s
+Join	src/main.rs	/^    Join(LobbyCode),$/;"	e	enum:Command
+JoinLobby	src/main.rs	/^    JoinLobby {$/;"	e	enum:ParseAction
+JoinRandom	src/main.rs	/^    JoinRandom,$/;"	e	enum:Command
+Lobby	src/main.rs	/^struct Lobby {$/;"	s
+LobbyCode	src/main.rs	/^type LobbyCode = [u8; LOBBY_CODE_LENGTH];$/;"	t
+LobbyState	src/main.rs	/^enum LobbyState {$/;"	g
+Noop	src/main.rs	/^    Noop,$/;"	e	enum:ParseAction
+Opt	src/main.rs	/^struct Opt {$/;"	s
+ParseAction	src/main.rs	/^enum ParseAction {$/;"	g
+ParseError	src/main.rs	/^enum ParseError {}$/;"	g
+PlayerState	src/main.rs	/^struct PlayerState {$/;"	s
+RaceFinished	src/main.rs	/^    RaceFinished,$/;"	e	enum:LobbyState
+RaceRunning	src/main.rs	/^    RaceRunning,$/;"	e	enum:LobbyState
+Restart	src/main.rs	/^    Restart,$/;"	e	enum:Command
+RestartLobby	src/main.rs	/^    RestartLobby,$/;"	e	enum:ParseAction
+Start	src/main.rs	/^    Start,$/;"	e	enum:Command
+StartLobby	src/main.rs	/^    StartLobby,$/;"	e	enum:ParseAction
+State	src/main.rs	/^    State(PlayerState),$/;"	e	enum:Command
+UpdatedState	src/main.rs	/^    UpdatedState {$/;"	e	enum:ParseAction
+WaitingForStart	src/main.rs	/^    WaitingForStart,$/;"	e	enum:LobbyState
+address	src/main.rs	/^    address: String,$/;"	m	struct:Opt
+backtrace	target/debug/build/anyhow-589145d4db7f6717/out/probe.rs	/^        fn backtrace(&self) -> Option<&Backtrace> {$/;"	P	implementation:E
+backtrace	target/rls/debug/build/anyhow-589145d4db7f6717/out/probe.rs	/^        fn backtrace(&self) -> Option<&Backtrace> {$/;"	P	implementation:E
+clients	src/main.rs	/^    clients: Vec<ClientId>,$/;"	m	struct:Lobby
+code	src/main.rs	/^    code: LobbyCode,$/;"	m	struct:Lobby
+current_completed_character	src/main.rs	/^    current_completed_character: usize,$/;"	m	struct:PlayerState
+current_word	src/main.rs	/^    current_word: usize,$/;"	m	struct:PlayerState
+did_make_mistake	src/main.rs	/^    did_make_mistake: bool,$/;"	m	struct:PlayerState
+fmt	target/debug/build/anyhow-589145d4db7f6717/out/probe.rs	/^        fn fmt(&self, _formatter: &mut fmt::Formatter) -> fmt::Result {$/;"	P	implementation:E
+fmt	target/rls/debug/build/anyhow-589145d4db7f6717/out/probe.rs	/^        fn fmt(&self, _formatter: &mut fmt::Formatter) -> fmt::Result {$/;"	P	implementation:E
+generate_lobby_code	src/main.rs	/^fn generate_lobby_code() -> LobbyCode {$/;"	f
+id	src/main.rs	/^    id: ClientId,$/;"	m	struct:ClientState
+leader_id	src/main.rs	/^    leader_id: ClientId,$/;"	m	struct:Lobby
+lobby	src/main.rs	/^    lobby: Option<LobbyCode>,$/;"	m	struct:ClientState
+main	src/main.rs	/^fn main() -> Result<()> {$/;"	f
+parse_client	src/main.rs	/^fn parse_client(client: &mut ClientState, lobby: Option<&Lobby>) -> Result<ParseAction> {$/;"	f
+parse_command	src/main.rs	/^fn parse_command(buffer: &[u8]) -> Result<Command> {$/;"	f
+parse_next	src/main.rs	/^        macro_rules! parse_next {$/;"	M	function:parse_command
+port	src/main.rs	/^    port: u16,$/;"	m	struct:Opt
+read_buffer	src/main.rs	/^    read_buffer: Vec<u8>,$/;"	m	struct:ClientState
+state	src/main.rs	/^    state: LobbyState,$/;"	m	struct:Lobby
+state	src/main.rs	/^    state: PlayerState,$/;"	m	struct:ClientState
+stream	src/main.rs	/^    stream: TcpStream,$/;"	m	struct:ClientState
+transition_client	src/main.rs	/^fn transition_client($/;"	f
