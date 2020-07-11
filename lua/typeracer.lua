@@ -1,5 +1,5 @@
 local uv = require 'luv'
-local splitter = require 'splitter'
+local splitter = require 'typeracer/splitter'
 local api = vim.api
 local insert = table.insert
 local format = string.format
