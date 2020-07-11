@@ -613,7 +613,9 @@ fn main() -> Result<()> {
             }
         }
 
-        std::thread::sleep(Duration::from_millis(10));
+        lobbies.retain(|_code, lobby| lobby.clients.iter().any(|c| clients.contains_key(c)));
+
+        std::thread::sleep(Duration::from_millis(5));
     }
 
     // Ok(())
