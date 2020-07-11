@@ -117,10 +117,10 @@ local function make_client(host, port, callback)
       keys = keys..keys:upper()
       keys = keys.."0123456789 _-'"
       for _, map in ipairs(api.nvim_get_keymap('n')) do
-        api.nvim_del_keymap('n', map.lhs)
+        pcall(api.nvim_del_keymap, 'n', map.lhs)
       end
       for _, map in ipairs(api.nvim_buf_get_keymap(0, 'n')) do
-        api.nvim_buf_del_keymap(buffer, 'n', map.lhs)
+        pcall(api.nvim_buf_del_keymap, buffer, 'n', map.lhs)
       end
       for i = 1, #keys do
         local k = keys:sub(i,i)
