@@ -20,3 +20,8 @@ This will create a new window with a 5 letter code you can use to join a game.
 If you are the one who created the game, use `lua require 'typeracer'.start()` to start the countdown.
 
 *NOTE: I only tested on master so far. It _might_ work on 0.4.2...*
+
+# Credit
+
+@BK1603 in the gif playing with me :)
+@kd\_\_\_\_\_\_t for helping me test during the stream.
