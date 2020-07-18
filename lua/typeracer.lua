@@ -9,6 +9,22 @@ local M = {}
 
 local ns = api.nvim_create_namespace("typeracer")
 
+local function attach_keybindings(buffer)
+  local keys = "abcdefghijklmnopqrstuvwxyz"
+  keys = keys..keys:upper()
+  keys = keys.."0123456789 _-'"
+  for _, map in ipairs(api.nvim_get_keymap('n')) do
+    pcall(api.nvim_del_keymap, 'n', map.lhs)
+  end
+  for _, map in ipairs(api.nvim_buf_get_keymap(0, 'n')) do
+    pcall(api.nvim_buf_del_keymap, buffer, 'n', map.lhs)
+  end
+  for i = 1, #keys do
+    local k = keys:sub(i,i)
+    api.nvim_buf_set_keymap(buffer, "n", k, format([[<cmd>lua require'typeracer'.check_key(%q)<cr>]], k), { noremap = true })
+  end
+end
+
 local function make_client(host, port, callback)
   assert(host and port)
   local current_lobby
@@ -23,7 +39,7 @@ local function make_client(host, port, callback)
   local is_counting_down = nil
 
   local buffer
-  local started
+  local start_time
   local finished
 
   local client_id
@@ -82,14 +98,28 @@ local function make_client(host, port, callback)
           insert(word_state, word)
         end
         word_state = concat(word_state, " ")
-        local prefix = format("%sP%d [%d]: ", is_me and "*" or " ", k, player.word)
+        local wpm = 0
+        if start_time and words and #words > 0 and player then
+          local total_keys_typed = player.char - 1
+          for i = 1, (player.word - 1) do
+            -- one extra for space
+            total_keys_typed = total_keys_typed + #words[i] + 1
+          end
+          if total_keys_typed == 0 then
+            wpm = 0
+          else
+            -- One "word" is 5 characters.
+            wpm = (total_keys_typed/5.0)/((uv.hrtime() - start_time)/1e9/60.0)
+          end
+        end
+        local prefix = format("%sP%d [%d]: %3d WPM ", is_me and "*" or " ", k, player.word, math.floor(wpm))
         insert(player_lines, prefix..word_state)
         player_draw_data[k] = { prefix_len = #prefix }
       end
       local state_line
       if finished then
         state_line = format("DONE! WINNER: %d", finished)
-      elseif started then
+      elseif start_time then
         state_line = "GO!!"
       elseif is_counting_down then
         state_line = format("COUNTDOWN %d", is_counting_down)
@@ -138,24 +168,10 @@ local function make_client(host, port, callback)
       client_id = tonumber(args[1])
     end
 
-    local function attach_keybindings(buffer)
-      local keys = "abcdefghijklmnopqrstuvwxyz"
-      keys = keys..keys:upper()
-      keys = keys.."0123456789 _-'"
-      for _, map in ipairs(api.nvim_get_keymap('n')) do
-        pcall(api.nvim_del_keymap, 'n', map.lhs)
-      end
-      for _, map in ipairs(api.nvim_buf_get_keymap(0, 'n')) do
-        pcall(api.nvim_buf_del_keymap, buffer, 'n', map.lhs)
-      end
-      for i = 1, #keys do
-        local k = keys:sub(i,i)
-        api.nvim_buf_set_keymap(buffer, "n", k, format([[<cmd>lua require'typeracer'.check_key(%q)<cr>]], k), { noremap = true })
-      end
-    end
-
     local function check_key(key)
-      if not started then return end
+      if not start_time then return end
+      if finished then return end
+      if not state.word then return end
       assert(words)
       -- TODO(ashkan): cleanup
       local target = assert(words[state.word]):sub(state.char,state.char)
@@ -226,7 +242,7 @@ local function make_client(host, port, callback)
     end
 
     function command_handler.STARTING(args)
-      started = true
+      start_time = uv.hrtime()
     end
 
     function command_handler.NEW_LEADER(args)
