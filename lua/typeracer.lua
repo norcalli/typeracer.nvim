@@ -46,6 +46,16 @@ local function make_client(host, port, callback)
 
   local players = {}
   local R = {}
+
+  local function calculate_total_keys_typed(player)
+    local total_keys_typed = player.char - 1
+    for i = 1, (player.word - 1) do
+      -- one extra for space
+      total_keys_typed = total_keys_typed + #words[i] + 1
+    end
+    return total_keys_typed
+  end
+
   stream:connect(host, port, function(err)
     assert(not err)
     local function send(command)
@@ -100,11 +110,7 @@ local function make_client(host, port, callback)
         word_state = concat(word_state, " ")
         local wpm = 0
         if start_time and words and #words > 0 and player then
-          local total_keys_typed = player.char - 1
-          for i = 1, (player.word - 1) do
-            -- one extra for space
-            total_keys_typed = total_keys_typed + #words[i] + 1
-          end
+          local total_keys_typed = calculate_total_keys_typed(player)
           if total_keys_typed == 0 then
             wpm = 0
           else
@@ -118,7 +124,12 @@ local function make_client(host, port, callback)
       end
       local state_line
       if finished then
-        state_line = format("DONE! WINNER: %d", finished)
+        table.sort(player_ids, function(a, b)
+          players[a].total_keys = players[a].total_keys or calculate_total_keys_typed(players[a])
+          players[b].total_keys = players[b].total_keys or calculate_total_keys_typed(players[b])
+          return players[a].total_keys < players[b].total_keys
+        end)
+        state_line = format("DONE! WINNER: %d. Here are the final standings.", finished)
       elseif start_time then
         state_line = "GO!!"
       elseif is_counting_down then
